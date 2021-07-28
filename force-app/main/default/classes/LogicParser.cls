@@ -1,10 +1,27 @@
 public with sharing class LogicParser {
     private Integer index = 0;
     public Expression parseLogicalExpression(String logicalExpression) {
-        logicalExpression = logicalExpression.replace('!', ' ! ');
-        List<String> tokens = logicalExpression.split(' ');
+        List<String> tokens = normalizeLogicalExpression(logicalExpression).split(' ');
         Expression exp = buildExpression(tokens);
         return exp;
+    }
+
+    private String normalizeLogicalExpression(String exp){
+        System.debug(exp);
+        exp = exp.replace(' ', '');
+        System.debug(exp);
+
+        //Find the following tokens: number, open parens, close parens, &&, ||, !
+        Pattern p = Pattern.compile('(\\d+|\\(|\\)|&{2}|\\|{2}|\\!)');
+        Matcher pm = p.matcher( exp );
+
+        String formattedExpression = '';
+        while(pm.find()) {
+            formattedExpression += pm.group() + ' ';
+        }
+
+        System.debug(formattedExpression);
+        return formattedExpression.trim();
     }
 
     private Expression buildExpression(List<String> tokens) {
